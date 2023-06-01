@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 import os
 import openai
-import configparser
 
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
@@ -11,14 +10,11 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 app = Flask(__name__)
 
-
-config = configparser.ConfigParser()
-config.read("config.ini")
 # LINE 聊天機器人的基本資料
-line_bot_api = LineBotApi(config.get('line-bot', 'channel_access_token'))
-handler = WebhookHandler(config.get('line-bot', 'channel_secret'))
+line_bot_api = LineBotApi(os.getenv("CHANNEL_ACCESS_TOKEN"))
+handler = WebhookHandler(os.getenv("CHANNEL_SECRET"))
 
-openai.api_key = config.get('open-ai', 'apikey')
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # 接收 LINE 的資訊
 @app.route("/callback", methods=['POST'])
