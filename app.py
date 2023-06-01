@@ -42,10 +42,11 @@ def echo(event):
             max_tokens=128,
             temperature=0.5,
         )
-        print(response["choices"][0]["text"])
+        ans = response["choices"][0]["text"]
+        print(response['choices'])
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text= response["choices"][0]["text"])
+            TextSendMessage(text= f"{ans}\n\n")
         )
 
 if __name__ == "__main__":
