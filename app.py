@@ -64,14 +64,21 @@ def echo(event):
             "track_id": None
         }
         
+        print("Generating........")
+
         response = requests.post("https://stablediffusionapi.com/api/v3/text2img", params=payload)
+        
+        print(response)
+
         response2json = response.json()
+
+        print(response2json)
+
         img_url = response2json["output"][0]
       # TextSendMessage(text= f"{img_url}")
-        app.logger.info("Generating....")
+
         line_bot_api.reply_message(
             event.reply_token,
-      
             ImageSendMessage(
                 original_content_url=f"{img_url}",
                 preview_image_url=f"{img_url}"
