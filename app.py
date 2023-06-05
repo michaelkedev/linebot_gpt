@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 import os
 import openai
+import requests
 
 from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
@@ -10,13 +11,14 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage
 
 app = Flask(__name__)
 
-# LINE 聊天機器人的基本資料
+
 line_bot_api = LineBotApi(os.getenv("CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("CHANNEL_SECRET"))
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# 接收 LINE 的資訊
+stable_diffusion_api = os.getenv("STABLE_DIFFFUSION_API_KEY")
+
 @app.route("/callback", methods=['POST'])
 def callback():
     signature = request.headers['X-Line-Signature']
@@ -31,22 +33,44 @@ def callback():
 
     return 'OK'
 
-# 學你說話
 @handler.add(MessageEvent, message=TextMessage)
 def echo(event):
     
     if event.source.user_id != "Udeadbeefdeadbeefdeadbeefdeadbeef":
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=event.message.text,
-            max_tokens=128,
-            temperature=0.5,
-        )
-        ans = response["choices"][0]["text"]
-        print(response['choices'])
+        ## Chatgpt
+        # response = openai.Completion.create(
+        #     model="text-davinci-003",
+        #     prompt=event.message.text,
+        #     max_tokens=128,
+        #     temperature=0.5,
+        # )
+
+        # ans = response["choices"][0]["text"]
+        # print(response['choices'])
+
+        payload = {
+            "key": stable_diffusion_api,
+            "prompt": event.message.text,
+            "negative_prompt": "((out of frame)), ((extra fingers)), mutated hands, ((poorly drawn hands)), ((poorly drawn face)), (((mutation))), (((deformed))), (((tiling))), ((naked)), ((tile)), ((fleshpile)), ((ugly)), (((abstract))), blurry, ((bad anatomy)), ((bad proportions)), ((extra limbs)), cloned face, (((skinny))), glitchy, ((extra breasts)), ((double torso)), ((extra arms)), ((extra hands)), ((mangled fingers)), ((missing breasts)), (missing lips), ((ugly face)), ((fat)), ((extra legs))",
+            "width": "512",
+            "height": "512",
+            "samples": "1",
+            "num_inference_steps": "20",
+            "safety_checker": "no",
+            "enhance_prompt": "yes",
+            "seed": None,
+            "guidance_scale": 7.5,
+            "webhook": None,
+            "track_id": None
+        }
+        
+        response = requests.post("https://stablediffusionapi.com/api/v3/text2img", params=payload)
+        response2json = response.json()
+        img_url = response2json["output"][0]
+
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text= f"{ans}\n\n")
+            TextSendMessage(text= f"{img_url}")
         )
 
 if __name__ == "__main__":
