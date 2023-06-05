@@ -68,6 +68,7 @@ def echo(event):
         response2json = response.json()
         img_url = response2json["output"][0]
       # TextSendMessage(text= f"{img_url}")
+        app.logger.info("Generating....")
         line_bot_api.reply_message(
             event.reply_token,
       
@@ -76,6 +77,8 @@ def echo(event):
                 preview_image_url=f"{img_url}"
             )
         )
+        app.logger.info("Done!")
+
 
 if __name__ == "__main__":
     app.run()
