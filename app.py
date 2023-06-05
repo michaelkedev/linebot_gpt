@@ -7,7 +7,7 @@ from flask import Flask, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, ImageSendMessage
 
 app = Flask(__name__)
 
@@ -67,10 +67,14 @@ def echo(event):
         response = requests.post("https://stablediffusionapi.com/api/v3/text2img", params=payload)
         response2json = response.json()
         img_url = response2json["output"][0]
-
+      # TextSendMessage(text= f"{img_url}")
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text= f"{img_url}")
+      
+            ImageSendMessage(
+                original_content_url=f"{img_url}",
+                preview_image_url=f"{img_url}"
+            )
         )
 
 if __name__ == "__main__":
