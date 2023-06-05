@@ -17,7 +17,7 @@ handler = WebhookHandler(os.getenv("CHANNEL_SECRET"))
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-stable_diffusion_api = os.getenv("STABLE_DIFFFUSION_API_KEY")
+stable_diffusion_api = os.getenv("STABLE_DIFFUSION_API_KEY")
 
 @app.route("/callback", methods=['POST'])
 def callback():
