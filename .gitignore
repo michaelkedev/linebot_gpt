@@ -159,4 +159,8 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 gpt_test.py
-config.ini
+*.ini
+
+*.jpg
+*.png
+*.gif
